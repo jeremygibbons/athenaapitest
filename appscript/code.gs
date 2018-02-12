@@ -23,10 +23,6 @@ function QUERYATHENAALAB(query) {
     if(status == 'SUCCEEDED') {
       var dataresponse = UrlFetchApp.fetch("https://d659yysa1h.execute-api.eu-west-1.amazonaws.com/prod/queryresults?queryId=" + queryId);
       
-      
-      // The results contain a header row, which we remove by shifting
-      j.shift();
-      
       // Read the types of the data in the JSON results
       var t = JSON.parse(dataresponse.getContentText())['ResultSet']['ResultSetMetadata']['ColumnInfo'];
       var typ = t.map(function (row) {
@@ -36,6 +32,9 @@ function QUERYATHENAALAB(query) {
       // Read the results, and generate an array that will be readable by Google Sheets, parsing relevant values
       // into usable types (mainly for ints, floats and dates)
       var j = JSON.parse(dataresponse.getContentText())['ResultSet']['Rows'];
+      
+      // The results contain a header row, which we remove by shifting
+      j.shift();
       var res = j.map(function (row) {
         return row['Data'].map(function (data, index) {
           if(typ[index] == 'date') return Date(data['VarCharValue']);
