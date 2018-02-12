@@ -29,12 +29,15 @@ function QUERYATHENAALAB(query) {
         return row['Type'];
       });
       
-      // Read the results, and generate an array that will be readable by Google Sheets, parsing relevant values
-      // into usable types (mainly for ints, floats and dates)
+      // Read the results as a JSON object, format per https://docs.aws.amazon.com/athena/latest/APIReference/API_GetQueryResults.html
       var j = JSON.parse(dataresponse.getContentText())['ResultSet']['Rows'];
       
       // The results contain a header row, which we remove by shifting
       j.shift();
+      
+      // Use map to generate an array understandable by Google Sheets.
+      // For types that have a clear non-string equivalent in Google Sheets,
+      // perform conversion.
       var res = j.map(function (row) {
         return row['Data'].map(function (data, index) {
           if(typ[index] == 'date') return Date(data['VarCharValue']);
